@@ -7,6 +7,7 @@ import {
   UseGuards,
   HttpStatus,
   HttpException,
+  Query,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
@@ -22,8 +23,11 @@ export class MovieController {
   @ApiResponse({ status: 200, description: 'Successfull Response' })
   @UseGuards(AuthGuard())
   @ApiBearerAuth()
-  async getAll() {
-    return await this.movieService.getAll();
+  async getAll(@Query('limit') limit: string, @Query('page') page: string) {
+    return await this.movieService.getAll({
+      limit: parseInt(limit),
+      page: parseInt(page),
+    });
   }
 
   @Get(':id')
