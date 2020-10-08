@@ -14,14 +14,20 @@ export class MovieService {
 
   async getAll(
     options: PaginationOptionsInterface,
+    title: string,
   ): Promise<Pagination<Movie>> {
-    const take = options.limit || 10;
-    const skip = options.page || 0;
+    const searchQuery = {
+      take: options.limit || 10,
+      skip: options.page || 0,
+    };
 
-    const [results, total] = await this.movieRepository.findAndCount({
-      take,
-      skip,
-    });
+    if (title != '' && title != undefined) {
+      searchQuery['where'] = { title };
+    }
+
+    const [results, total] = await this.movieRepository.findAndCount(
+      searchQuery,
+    );
 
     return new Pagination<Movie>({ results, total });
   }
