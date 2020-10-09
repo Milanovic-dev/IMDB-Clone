@@ -21,13 +21,18 @@ export class MovieController {
 
   @Get()
   @ApiResponse({ status: 200, description: 'Successfull Response' })
-  @UseGuards(AuthGuard())
-  @ApiBearerAuth()
-  async getAll(@Query('limit') limit: string, @Query('page') page: string) {
-    return await this.movieService.getAll({
-      limit: parseInt(limit),
-      page: parseInt(page),
-    });
+  async getAll(
+    @Query('limit') limit: string,
+    @Query('page') page: string,
+    @Query('title') title: string,
+  ) {
+    return await this.movieService.getAll(
+      {
+        limit: parseInt(limit),
+        page: parseInt(page),
+      },
+      title,
+    );
   }
 
   @Get(':id')
