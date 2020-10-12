@@ -1,18 +1,20 @@
 import {
   Controller,
+  Request,
   Body,
   Post,
   Get,
   Param,
   UseGuards,
-  HttpStatus,
   HttpException,
   Query,
+  Put,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { MoviePayload } from './movie.payload';
 import { AuthGuard } from '@nestjs/passport';
+import { Action } from 'modules/userRatedMovies/userRatedMovies.entity';
 
 @Controller('api/movies')
 @ApiTags('movies')
@@ -38,18 +40,44 @@ export class MovieController {
   @Get(':id')
   @ApiResponse({ status: 200, description: 'Successfull Response' })
   @ApiResponse({ status: 404, description: 'Item not found' })
-  @UseGuards(AuthGuard())
-  @ApiBearerAuth()
-  async get(@Param('id') id: string) {
-    const movie = await this.movieService.get(id);
-    if (!movie) {
-      throw new HttpException(
-        `Movie with id ${id} does not exist`,
-        HttpStatus.NOT_FOUND,
-      );
+  async get(@Param('id') id: number) {
+    try {
+      return await this.movieService.getAndCountView(id);
+    } catch (error) {
+      throw new HttpException(error.response.message, error.status);
     }
+  }
 
-    return movie;
+  @Put('like/:id')
+  @UseGuards(AuthGuard())
+  async like(@Request() request, @Param('id') movieId: number) {
+    const recordInterface = {
+      userId: request.user.id,
+      movieId: movieId,
+      action: Action.LIKE,
+    };
+
+    try {
+      await this.movieService.like(recordInterface);
+    } catch (error) {
+      throw new HttpException(error.response.message, error.status);
+    }
+  }
+
+  @Put('dislike/:id')
+  @UseGuards(AuthGuard())
+  async dislike(@Request() request, @Param('id') movieId: number) {
+    const recordInterface = {
+      userId: request.user.id,
+      movieId: movieId,
+      action: Action.DISLIKE,
+    };
+
+    try {
+      await this.movieService.dislike(recordInterface);
+    } catch (error) {
+      throw new HttpException(error.response.message, error.status);
+    }
   }
 
   @Post()
