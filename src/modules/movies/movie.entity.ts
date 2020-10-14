@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { UserRatedMovies } from 'modules/userRatedMovies/userRatedMovies.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity({ name: 'movies' })
 export class Movie {
@@ -16,4 +17,13 @@ export class Movie {
 
   @Column()
   genre: string;
+
+  @Column()
+  likes: number;
+
+  @Column()
+  dislikes: number;
+
+  @Column()
+  pageViews: number;
 }
